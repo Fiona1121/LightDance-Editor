@@ -12,67 +12,36 @@ import LightPresets from "../../components/Presets/LightPresets";
 import PosPresets from "../../components/Presets/PosPresets";
 import EffectList from "../../components/EffectList";
 import LightEditor from "../../components/LightEditor";
-import FrameList from "../../components/FrameList";
+import PosEditor from "../../components/PosEditor";
 import CommandCenter from "../../components/CommandCenter";
 import ThreeSimulator from "../../components/ThreeSimulator";
-import File from "components/Settings/File";
-import DancerTree from "components/DancerTree";
-import LightProps from "components/LightProps";
-import ColorPalette from "components/ColorPalette";
 
-import { Box } from "@mui/material";
+import { LayoutContext } from "contexts/layoutContext";
 
-import { LayoutContext } from "contexts/LayoutContext";
-
-import {
-  betaConfig,
-  defaultEditorConfig,
-  mirroredEditorConfig,
-  legacyEditorConfig,
-  commandCenterConfig,
-} from "layouts";
+import editorConfig from "layouts/editor.json";
+import legacyEditorConfig from "layouts/legacyEditor.json";
+import commandConfig from "layouts/commandCenter.json";
 
 const Layout = () => {
-    const { preferedEditor, mode } = useContext(LayoutContext) as layoutContext;
+  const { preferedEditor, mode } = useContext(LayoutContext) as layoutContext;
 
-<<<<<<< HEAD
   const CommandCenterNode = useMemo<JSX.Element>(() => <CommandCenter />, []);
   const SimulatorNode = useMemo<JSX.Element>(() => <Simulator />, []);
   const ThreeSimulatorNode = useMemo<JSX.Element>(() => <ThreeSimulator />, []);
   const LightEditorNode = useMemo<JSX.Element>(() => <LightEditor />, []);
-  const FrameListNode = useMemo<JSX.Element>(() => <FrameList />, []);
-  const DancerTreeNode = useMemo<JSX.Element>(() => <DancerTree />, []);
-  const LightPropsNode = useMemo<JSX.Element>(() => <LightProps />, []);
+  const PosEditorNode = useMemo<JSX.Element>(() => <PosEditor />, []);
   const LightPresetsNode = useMemo<JSX.Element>(() => <LightPresets />, []);
   const PosPresetsNode = useMemo<JSX.Element>(() => <PosPresets />, []);
   const EffectListNode = useMemo<JSX.Element>(() => <EffectList />, []);
   const WavesurferNode = useMemo<JSX.Element>(() => <Wavesurfer />, []);
-  const ColorPaletteNode = useMemo<JSX.Element>(() => <ColorPalette />, []);
-
   const WaveSuferCleanNode = useMemo<JSX.Element>(
     () => <Wavesurfer cleanMode />,
-    []
-  );
-  const FileNode = useMemo<JSX.Element>(
-    () => (
-      <Box
-        sx={{
-          width: "100%",
-          height: "100%",
-          p: "5% 8%",
-        }}
-      >
-        <File />
-      </Box>
-    ),
     []
   );
 
   const factory = (node: TabNode) => {
     const component = node.getComponent();
     switch (component) {
-      case "ColorPalette":
-        return ColorPaletteNode;
       case "CommandCenter":
         return CommandCenterNode;
       case "Simulator":
@@ -81,12 +50,8 @@ const Layout = () => {
         return ThreeSimulatorNode;
       case "LightEditor":
         return LightEditorNode;
-      case "FrameList":
-        return FrameListNode;
-      case "DancerTree":
-        return DancerTreeNode;
-      case "LightProps":
-        return LightPropsNode;
+      case "PosEditor":
+        return PosEditorNode;
       case "LightPresets":
         return LightPresetsNode;
       case "PosPresets":
@@ -97,8 +62,6 @@ const Layout = () => {
         return WavesurferNode;
       case "WavesurferClean":
         return WaveSuferCleanNode;
-      case "File":
-        return FileNode;
       default:
         return null;
     }
@@ -106,13 +69,7 @@ const Layout = () => {
 
   const EditorNode = useMemo(() => {
     const configFile =
-      preferedEditor === "mirrored"
-        ? mirroredEditorConfig
-        : preferedEditor === "legacy"
-        ? legacyEditorConfig
-        : preferedEditor === "beta"
-        ? betaConfig
-        : defaultEditorConfig;
+      preferedEditor === "default" ? editorConfig : legacyEditorConfig;
     return (
       <FlexLayout.Layout
         model={FlexLayout.Model.fromJson(configFile as IJsonModel)}
@@ -125,78 +82,17 @@ const Layout = () => {
   const CommandNode = useMemo(() => {
     return (
       <FlexLayout.Layout
-        model={FlexLayout.Model.fromJson(commandCenterConfig as IJsonModel)}
+        // @ts-ignore:next-line
+        model={FlexLayout.Model.fromJson(commandConfig as IJsonModel)}
         factory={factory}
         font={{ size: "12px" }}
       />
     );
   }, []);
-=======
-    const CommandCenterNode = useMemo<JSX.Element>(() => <CommandCenter />, []);
-    const SimulatorNode = useMemo<JSX.Element>(() => <Simulator />, []);
-    const ThreeSimulatorNode = useMemo<JSX.Element>(() => <ThreeSimulator />, []);
-    const LightEditorNode = useMemo<JSX.Element>(() => <LightEditor />, []);
-    const PosEditorNode = useMemo<JSX.Element>(() => <PosEditor />, []);
-    const LightPresetsNode = useMemo<JSX.Element>(() => <LightPresets />, []);
-    const PosPresetsNode = useMemo<JSX.Element>(() => <PosPresets />, []);
-    const EffectListNode = useMemo<JSX.Element>(() => <EffectList />, []);
-    const WavesurferNode = useMemo<JSX.Element>(() => <Wavesurfer />, []);
-    const WaveSuferCleanNode = useMemo<JSX.Element>(() => <Wavesurfer cleanMode />, []);
 
-    const factory = (node: TabNode) => {
-        const component = node.getComponent();
-        switch (component) {
-            case "CommandCenter":
-                return CommandCenterNode;
-            case "Simulator":
-                return SimulatorNode;
-            case "ThreeSimulator":
-                return ThreeSimulatorNode;
-            case "LightEditor":
-                return LightEditorNode;
-            case "PosEditor":
-                return PosEditorNode;
-            case "LightPresets":
-                return LightPresetsNode;
-            case "PosPresets":
-                return PosPresetsNode;
-            case "EffectList":
-                return EffectListNode;
-            case "Wavesurfer":
-                return WavesurferNode;
-            case "WavesurferClean":
-                return WaveSuferCleanNode;
-            default:
-                return null;
-        }
-    };
+  const LayoutNode = mode === "editor" ? EditorNode : CommandNode;
 
-    const EditorNode = useMemo(() => {
-        const configFile = preferedEditor === "default" ? editorConfig : legacyEditorConfig;
-        return (
-            <FlexLayout.Layout
-                model={FlexLayout.Model.fromJson(configFile as IJsonModel)}
-                factory={factory}
-                font={{ size: "12px" }}
-            />
-        );
-    }, [preferedEditor]);
-
-    const CommandNode = useMemo(() => {
-        return (
-            <FlexLayout.Layout
-                // @ts-ignore:next-line
-                model={FlexLayout.Model.fromJson(commandConfig as IJsonModel)}
-                factory={factory}
-                font={{ size: "12px" }}
-            />
-        );
-    }, []);
->>>>>>> finish EffectList component layout and looks
-
-    const LayoutNode = mode === "editor" ? EditorNode : CommandNode;
-
-    return <>{LayoutNode}</>;
+  return <>{LayoutNode}</>;
 };
 
 export default Layout;

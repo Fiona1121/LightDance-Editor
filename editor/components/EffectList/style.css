@@ -1,17 +1,8 @@
 .static {
-<<<<<<< HEAD
   position: absolute;
   background: white;
 }
 
 .static:hover {
   opacity: 0;
-=======
-    position: absolute;
-    background: white;
-}
-
-.static:hover {
-    opacity: 0;
->>>>>>> finish EffectList component layout and looks
 }

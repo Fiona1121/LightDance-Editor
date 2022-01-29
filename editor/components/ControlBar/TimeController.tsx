@@ -1,74 +1,73 @@
-import { useEffect, useState, useRef } from "react";
+// redux
+import { useSelector, useDispatch } from "react-redux";
 // mui
+import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
 import { Stack } from "@mui/material";
-import FrameControlInput from "./FrameControlInput";
+
+import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+// actions and selector
+import { selectGlobal, setTime, setPosFrame, setControlFrame } from "../../slices/globalSlice";
+// constant
+import { TIMECONTROLLER } from "../../constants";
+
 import TimeControlInput from "./TimeControlInput";
-
-// reactive state
-import { useReactiveVar } from "@apollo/client";
-import { reactiveState } from "../../core/state";
-import { setCurrentControlIndex, setCurrentPosIndex } from "../../core/actions";
-
-// hotkeys
-import { useHotkeys } from "react-hotkeys-hook";
-// constants
-import { CONTROL_EDITOR } from "constants";
 
 /**
  * Time Data Controller (time, controlFrame, posFrame)
  */
 export default function TimeController() {
-  const currentControlIndex = useReactiveVar(reactiveState.currentControlIndex);
-  const currentPosIndex = useReactiveVar(reactiveState.currentPosIndex);
+    // redux
+    const dispatch = useDispatch();
+    const {
+        timeData: { time, controlFrame, posFrame },
+    } = useSelector(selectGlobal);
 
-  const handleChange = (setValue: (arg0: any) => void) => {
-    return (value: number) => setValue({ payload: value });
-  };
-  const handleChangeControlFrame = handleChange(setCurrentControlIndex);
-  const handleChangePosFrame = handleChange(setCurrentPosIndex);
+    const handleChange = (setValue: (arg0: any) => void, valueName: string) => {
+        return (value: number) => {
+            dispatch(
+                setValue({
+                    from: TIMECONTROLLER,
+                    [valueName]: value,
+                })
+            );
+        };
+    };
 
-  const editor = useReactiveVar(reactiveState.editor);
-  useHotkeys(
-    "right, w",
-    () => {
-      if (editor === CONTROL_EDITOR)
-        handleChangeControlFrame(currentControlIndex + 1);
-      else handleChangePosFrame(currentPosIndex + 1);
-    },
-    [editor, currentControlIndex, currentPosIndex]
-  );
-  useHotkeys(
-    "left, q",
-    () => {
-      if (editor === CONTROL_EDITOR)
-        handleChangeControlFrame(currentControlIndex - 1);
-      else handleChangePosFrame(currentPosIndex - 1);
-    },
-    [editor, currentControlIndex, currentPosIndex]
-  );
+    const handleChangeTime = handleChange(setTime, "time");
+    const handleChangeControlFrame = handleChange(setControlFrame, "controlFrame");
+    const handleChangePosFrame = handleChange(setPosFrame, "posFrame");
 
-  return (
-    <Stack
-      direction="row"
-      justifyContent="center"
-      alignItems="center"
-      gap="1vw"
-    >
-      <TimeControlInput />
+    return (
+        <Stack direction="row" justifyContent="center" alignItems="center">
+            <Typography variant="body1" color="initial" style={{ marginRight: "1em" }}>
+                time:
+            </Typography>
+            <TimeControlInput value={time} placeholder="time" handleChange={handleChangeTime} />
 
-      <FrameControlInput
-        label="control frame"
-        value={currentControlIndex}
-        placeholder="status index"
-        handleChange={handleChangeControlFrame}
-      />
+            <Typography variant="body1" color="initial" style={{ marginLeft: "1em" }}>
+                control frame:
+            </Typography>
+            <IconButton onClick={() => handleChangeControlFrame(controlFrame - 1)}>
+                <ChevronLeftIcon />
+            </IconButton>
+            <TimeControlInput value={controlFrame} placeholder="status index" handleChange={handleChangeControlFrame} />
+            <IconButton onClick={() => handleChangeControlFrame(controlFrame + 1)}>
+                <ChevronRightIcon />
+            </IconButton>
 
-      <FrameControlInput
-        label="position frame"
-        value={currentPosIndex}
-        placeholder="position index"
-        handleChange={handleChangePosFrame}
-      />
-    </Stack>
-  );
+            <Typography variant="body1" color="initial">
+                position frame:
+            </Typography>
+            <IconButton onClick={() => handleChangePosFrame(posFrame - 1)}>
+                <ChevronLeftIcon />
+            </IconButton>
+
+            <TimeControlInput value={posFrame} placeholder="position index" handleChange={handleChangePosFrame} />
+            <IconButton onClick={() => handleChangePosFrame(posFrame + 1)}>
+                <ChevronRightIcon />
+            </IconButton>
+        </Stack>
+    );
 }
