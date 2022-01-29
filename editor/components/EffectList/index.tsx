@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -186,4 +187,10 @@ export default function EffectList() {
       </Dialog>
     </div>
   );
+=======
+import React, { useState } from "react";
+
+export default function EffectList() {
+    return;
+>>>>>>> add types for effect list and update loadSlice for loading effect list variables
 }
