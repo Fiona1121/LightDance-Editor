@@ -9,11 +9,14 @@ import {
     selectGlobal,
     setEffectRecordMap,
     setEffectStatusMap,
-    setTime,
 } from "slices/globalSlice";
 import { selectLoad } from "slices/loadSlice";
-import { getItem } from "utils/localStorage";
+import { setTime } from "core/actions";
+import { getItem } from "core/utils";
 import { TIMECONTROLLER } from "constants";
+
+import { WaveSurferAppContext } from "contexts/WavesurferContext";
+import { wavesurferContext } from "types/components/wavesurfer";
 
 // mui materials
 import {
@@ -40,8 +43,6 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import * as CanvasCapture from "canvas-capture";
 import "./style.css";
-import { WaveSurferAppContext } from "contexts/WavesurferContext";
-import { wavesurferContext } from "types/components/wavesurfer";
 
 export default function EffectList() {
     const dispatch = useDispatch();
