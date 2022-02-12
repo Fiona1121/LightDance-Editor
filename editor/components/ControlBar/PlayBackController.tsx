@@ -1,47 +1,29 @@
-import WaveSurferApp from "../Wavesurfer/WaveSurferApp";
+import WaveSurferApp from "../wavesurfer/waveSurferApp";
 
-import { IconButton, Box } from "@mui/material";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import PauseIcon from "@mui/icons-material/Pause";
-import StopIcon from "@mui/icons-material/Stop";
-import LoopIcon from "@mui/icons-material/Loop";
-// hotkeys
-import { useHotkeys } from "react-hotkeys-hook";
-
-import { reactiveState } from "core/state";
-import { useReactiveVar } from "@apollo/client";
+import IconButton from "@material-ui/core/IconButton";
+import PlayArrowIcon from "@material-ui/icons/PlayArrow";
+import PauseIcon from "@material-ui/icons/Pause";
+import StopIcon from "@material-ui/icons/Stop";
+import LoopIcon from "@material-ui/icons/Loop";
 
 const PlayBackController = ({ wavesurfer }: { wavesurfer: WaveSurferApp }) => {
-  // event
-  const handlePlayPause = () => wavesurfer.playPause();
-  const handleStop = () => wavesurfer.stop();
-  const handlePlayLoop = () => wavesurfer.playLoop();
-
-  const isPlaying = useReactiveVar(reactiveState.isPlaying);
-
-  // press space for play pause
-  useHotkeys(
-    "space",
-    (e) => {
-      e.preventDefault();
-      handlePlayPause();
-    },
-    [wavesurfer]
-  );
-
-  return (
-    <Box>
-      <IconButton color="default" onClick={handlePlayPause}>
-        {isPlaying ? <PauseIcon /> : <PlayArrowIcon />}
-      </IconButton>
-      <IconButton color="default" onClick={handleStop}>
-        <StopIcon />
-      </IconButton>
-      <IconButton color="default" onClick={handlePlayLoop}>
-        <LoopIcon />
-      </IconButton>
-    </Box>
-  );
+    // event
+    const handlePlayPause = () => wavesurfer.playPause();
+    const handleStop = () => wavesurfer.stop();
+    const handlePlayLoop = () => wavesurfer.playLoop();
+    return (
+        <div>
+            <IconButton color="default" id="play-pause" onClick={handlePlayPause}>
+                <PlayArrowIcon /> / <PauseIcon />
+            </IconButton>
+            <IconButton color="default" onClick={handleStop}>
+                <StopIcon />
+            </IconButton>
+            <IconButton color="default" onClick={handlePlayLoop}>
+                <LoopIcon />
+            </IconButton>
+        </div>
+    );
 };
 
 export default PlayBackController;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 // actions and selectors
@@ -9,9 +9,11 @@ import {
     selectGlobal,
     setEffectRecordMap,
     setEffectStatusMap,
+    setTime,
 } from "slices/globalSlice";
 import { selectLoad } from "slices/loadSlice";
 import { getItem } from "utils/localStorage";
+import { TIMECONTROLLER } from "constants";
 
 // mui materials
 import {
@@ -36,16 +38,20 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import * as CanvasCapture from "canvas-capture";
 import "./style.css";
+import { WaveSurferAppContext } from "contexts/WavesurferContext";
+import { wavesurferContext } from "types/components/wavesurfer";
 
 export default function EffectList() {
     const dispatch = useDispatch();
     const { effectRecordMap: loadedEffectRecordMap } = useSelector(selectLoad); // load from default
     const { effectStatusMap: loadedEffectStatusMap } = useSelector(selectLoad); // load from default
-    const { controlRecord, controlMap, effectRecordMap, effectStatusMap } = useSelector(selectGlobal);
+    const { isPlaying, controlRecord, controlMap, effectRecordMap, effectStatusMap } = useSelector(selectGlobal);
     const {
-        timeData: { time, controlFrame, posFrame },
+        timeData: { time, controlFrame },
     } = useSelector(selectGlobal);
+    const { waveSurferApp } = useContext(WaveSurferAppContext) as wavesurferContext;
 
     // initilize effectRecordMap and effectStatusMap
     useEffect(() => {
@@ -69,6 +75,7 @@ export default function EffectList() {
     const [applyOpened, setApplyOpened] = useState<boolean>(false); // open apply effect dialog
     const [deleteOpened, setDeleteOpened] = useState<boolean>(false); // open delete effect dialog
     const [addOpened, setAddOpened] = useState<boolean>(false); // open add effect dialog
+    const [previewing, setPreviewing] = useState<boolean>(false);
 
     const handleCollide = () => {
         const lastFrameNum: number = effectRecordMap[effectSelected].length - 1;
@@ -124,7 +131,16 @@ export default function EffectList() {
         setNewEffectTo("");
     };
 
-    const handleAddEffect = () => {
+    const handleAddEffect = async () => {
+        // dispatch(setTime({ from: TIMECONTROLLER, time: controlMap[controlRecord[parseInt(newEffectFrom)]].start }));
+        await reduxPromiseAction(setTime, {
+            from: TIMECONTROLLER,
+            time: controlMap[controlRecord[parseInt(newEffectFrom)]].start,
+        });
+        waveSurferApp.playPause();
+        setPreviewing(true);
+        handleCloseAdd();
+        handleRecordCanvas();
         dispatch(
             addEffect({
                 effectName: newEffectName,
@@ -132,8 +148,37 @@ export default function EffectList() {
                 endIndex: parseInt(newEffectTo) + 1,
             })
         );
-        setAddOpened(false);
     };
+
+    const reduxPromiseAction = (setValue: Function, payload) => {
+        return new Promise((resolve, reject) => {
+            dispatch(setValue(payload));
+            resolve(payload);
+        });
+    };
+
+    const handleRecordCanvas = () => {
+        CanvasCapture.init(document.getElementById("main_stage")?.childNodes[0], {
+            ffmpegCorePath: "./node_modules/@ffmpeg/core/dist/ffmpeg-core.js",
+        });
+        CanvasCapture.beginGIFRecord({ name: "myGif" });
+    };
+
+    useEffect(() => {
+        if (previewing) {
+            const stopTime = controlMap[controlRecord[parseInt(newEffectTo)]].start;
+            const record = setInterval(() => {
+                if (Math.round(waveSurferApp.waveSurfer.getCurrentTime() * 1000) >= stopTime) {
+                    waveSurferApp.playPause();
+                    CanvasCapture.stopRecord();
+                    setPreviewing(false);
+                    clearInterval(record);
+                } else {
+                    CanvasCapture.recordFrame();
+                }
+            }, 20);
+        }
+    }, [previewing]);
 
     return (
         <div>
@@ -284,14 +329,18 @@ export default function EffectList() {
                         }}
                         required
                         variant="standard"
-                        sx={{ marginRight: 3.5 }}
+                        sx={{ marginRight: 3.2 }}
                         value={newEffectFrom}
                         helperText={
                             parseInt(newEffectFrom) < 0 || parseInt(newEffectFrom) >= controlRecord.length
                                 ? "No such frame"
                                 : ""
                         }
-                        error={parseInt(newEffectFrom) < 0 || parseInt(newEffectFrom) >= controlRecord.length}
+                        error={
+                            parseInt(newEffectFrom) < 0 ||
+                            parseInt(newEffectFrom) >= controlRecord.length ||
+                            parseInt(newEffectTo) < parseInt(newEffectFrom)
+                        }
                         onChange={(e) => setNewEffectFrom(e.target.value)}
                     />
                     <TextField
@@ -311,7 +360,11 @@ export default function EffectList() {
                                 ? "No such frame"
                                 : ""
                         }
-                        error={parseInt(newEffectTo) < 0 || parseInt(newEffectTo) >= controlRecord.length}
+                        error={
+                            parseInt(newEffectTo) < 0 ||
+                            parseInt(newEffectTo) >= controlRecord.length ||
+                            parseInt(newEffectTo) < parseInt(newEffectFrom)
+                        }
                         onChange={(e) => setNewEffectTo(e.target.value)}
                     />
                 </DialogContent>
@@ -326,7 +379,8 @@ export default function EffectList() {
                             !newEffectTo ||
                             !newEffectFrom ||
                             parseInt(newEffectFrom) >= controlRecord.length ||
-                            parseInt(newEffectTo) >= controlRecord.length
+                            parseInt(newEffectTo) >= controlRecord.length ||
+                            parseInt(newEffectTo) < parseInt(newEffectFrom)
                         }
                     >
                         Add
