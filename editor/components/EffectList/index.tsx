@@ -1,19 +1,14 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
-// actions and selectors
-import {
-    addEffect,
-    applyEffect,
-    deleteEffect,
-    selectGlobal,
-    setEffectRecordMap,
-    setEffectStatusMap,
-} from "slices/globalSlice";
 import { selectLoad } from "slices/loadSlice";
-import { setTime } from "core/actions";
+import { setTime, addEffect, applyEffect, deleteEffect, setEffectRecordMap, setEffectStatusMap } from "core/actions";
 import { getItem } from "core/utils";
+import { reactiveState } from "core/state";
+import { useReactiveVar } from "@apollo/client";
 import { TIMECONTROLLER } from "constants";
+
+import useControl from "hooks/useControl";
 
 import { WaveSurferAppContext } from "contexts/WavesurferContext";
 import { wavesurferContext } from "types/components/wavesurfer";
@@ -45,26 +40,26 @@ import * as CanvasCapture from "canvas-capture";
 import "./style.css";
 
 export default function EffectList() {
-    const dispatch = useDispatch();
     const { effectRecordMap: loadedEffectRecordMap } = useSelector(selectLoad); // load from default
     const { effectStatusMap: loadedEffectStatusMap } = useSelector(selectLoad); // load from default
-    const { isPlaying, controlRecord, controlMap, effectRecordMap, effectStatusMap } = useSelector(selectGlobal);
-    const {
-        timeData: { time, controlFrame },
-    } = useSelector(selectGlobal);
+    // const { effectRecordMap, effectStatusMap } = useSelector(selectGlobal);
+    const { controlMap, controlRecord } = useControl();
+    const effectRecordMap = useReactiveVar(reactiveState.effectRecordMap);
+    const effectStatusMap = useReactiveVar(reactiveState.effectStatusMap);
+    const { time, controlFrame } = useReactiveVar(reactiveState.timeData);
     const { waveSurferApp } = useContext(WaveSurferAppContext) as wavesurferContext;
 
     // initilize effectRecordMap and effectStatusMap
     useEffect(() => {
         if (!getItem("effectRecordMap")) {
-            dispatch(setEffectRecordMap(loadedEffectRecordMap)); // set state with default
+            setEffectRecordMap({ payload: loadedEffectRecordMap }); // set state with default
         } else {
-            dispatch(setEffectRecordMap(JSON.parse(getItem("effectRecordMap") || ""))); // set state with local storage value
+            setEffectRecordMap({ payload: JSON.parse(getItem("effectRecordMap") || "") }); // set state with local storage value
         }
         if (!getItem("effectStatusMap")) {
-            dispatch(setEffectStatusMap(loadedEffectStatusMap)); // set state with default
+            setEffectStatusMap({ payload: loadedEffectStatusMap }); // set state with default
         } else {
-            dispatch(setEffectStatusMap(JSON.parse(getItem("effectStatusMap") || ""))); // set state with local storage value
+            setEffectStatusMap({ payload: JSON.parse(getItem("effectStatusMap") || "") }); // set state with local storage value
         }
     }, []);
 
@@ -103,7 +98,7 @@ export default function EffectList() {
         setCollidedFrame([]);
     };
     const handleApplyEffect = () => {
-        dispatch(applyEffect(effectSelected));
+        applyEffect({ payload: effectSelected });
         setApplyOpened(false);
     };
 
@@ -117,43 +112,42 @@ export default function EffectList() {
     };
 
     const handleDeleteEffect = () => {
-        dispatch(deleteEffect(effectSelected));
+        deleteEffect({ payload: effectSelected });
         setDeleteOpened(false);
     };
 
     const handleOpenAdd = () => {
         setAddOpened(true);
-    };
-
-    const handleCloseAdd = () => {
-        setAddOpened(false);
         setNewEffectName("");
         setNewEffectFrom("");
         setNewEffectTo("");
     };
 
+    const handleCloseAdd = () => {
+        setAddOpened(false);
+    };
+
     const handleAddEffect = async () => {
-        // dispatch(setTime({ from: TIMECONTROLLER, time: controlMap[controlRecord[parseInt(newEffectFrom)]].start }));
+        // setTime({ payload: { from: TIMECONTROLLER, time: controlMap[controlRecord[parseInt(newEffectFrom)]].start } });
         await reduxPromiseAction(setTime, {
-            from: TIMECONTROLLER,
-            time: controlMap[controlRecord[parseInt(newEffectFrom)]].start,
+            payload: { from: TIMECONTROLLER, time: controlMap[controlRecord[parseInt(newEffectFrom)]].start },
         });
         waveSurferApp.playPause();
         setPreviewing(true);
         handleCloseAdd();
         handleRecordCanvas();
-        dispatch(
-            addEffect({
+        addEffect({
+            payload: {
                 effectName: newEffectName,
                 startIndex: parseInt(newEffectFrom),
                 endIndex: parseInt(newEffectTo) + 1,
-            })
-        );
+            },
+        });
     };
 
-    const reduxPromiseAction = (setValue: Function, payload) => {
+    const reduxPromiseAction = (setValue, payload) => {
         return new Promise((resolve, reject) => {
-            dispatch(setValue(payload));
+            setValue(payload);
             resolve(payload);
         });
     };
@@ -177,7 +171,7 @@ export default function EffectList() {
                 } else {
                     CanvasCapture.recordFrame();
                 }
-            }, 20);
+            }, 10);
         }
     }, [previewing]);
 
