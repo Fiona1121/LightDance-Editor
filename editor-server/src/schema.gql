@@ -3,392 +3,380 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
-input addColorInput {
-  color: String!
-  colorCode: String!
-}
-
 input AddDancerInput {
-  name: String!
+    name: String!
 }
 
 input AddLEDInput {
-  effectName: String!
-  effects: [LEDEffectInput!]!
-  partName: String!
-  repeat: Int!
+    effectName: String!
+    effects: [LEDEffectInput!]!
+    partName: String!
+    repeat: Int!
 }
 
 input AddPartInput {
-  dancerName: String!
-  name: String!
-  type: String!
-}
-
-type Color {
-  color: String!
-  colorCode: String!
+    dancerName: String!
+    name: String!
+    type: String!
 }
 
 input ColorInput {
-  color: String!
-  colorCode: String!
+    color: String!
+    colorCode: String!
 }
 
 type ColorMap {
-  colorMap: ColorMapCustomScalar!
+    colorMap: ColorMapCustomScalar!
 }
 
-"""Color map scalar type"""
+"""
+Color map scalar type
+"""
 scalar ColorMapCustomScalar
 
 type ColorPayload {
-  color: String!
-  colorCode: String
-  editBy: String!
-  mutation: String!
+    color: String!
+    colorCode: String
+    editBy: String!
+    mutation: String!
 }
 
 type Control {
-  frame: ControlFrame!
-  status: ControlDevice!
+    frame: ControlFrame!
+    status: ControlDevice!
 }
 
 type ControlData {
-  frame: ControlMapMutationObjectId!
+    frame: ControlMapMutationObjectId!
 }
 
 input ControlDataInput {
-  alpha: Float
-  color: String
-  ELValue: Float
-  partName: String!
-  src: String
+    alpha: Float
+    color: String
+    ELValue: Float
+    partName: String!
+    src: String
 }
 
 union ControlDevice = EL | FIBER | LED
 
 type ControlFrame {
-  editing: String
-  fade: Boolean!
-  id: ID!
-  start: Float!
+    editing: String
+    fade: Boolean!
+    id: ID!
+    start: Float!
 }
 
-"""Mongo object id scalar type"""
+"""
+Mongo object id scalar type
+"""
 scalar ControlMapMutationObjectId
 
 type ControlMapPayload {
-  editBy: String!
-  frame: ControlMapMutationObjectId!
+    editBy: String!
+    frame: ControlMapMutationObjectId
+    frameID: String!
+    mutation: String!
 }
 
 type ControlRecordPayload {
-  addID: [String!]!
-  deleteID: [String!]!
-  editBy: String!
-  index: Int!
-  mutation: String!
-  updateID: [String!]!
+    editBy: String!
+    frameID: ID!
+    index: Int!
+    mutation: String!
+    updateID: [String!]!
 }
 
-"""The basic control types"""
+"""
+The basic control types
+"""
 enum ControlType {
-  EL
-  FIBER
-  LED
+    EL
+    FIBER
+    LED
 }
 
 type Dancer {
-  id: ID!
-  name: String!
-  parts: [Part!]!
-  positionData: [Position!]!
+    id: ID!
+    name: String!
+    parts: [Part!]!
+    positionData: [Position!]!
 }
 
 enum dancerMutation {
-  CREATED
-  DELETED
-  UPDATED
+    CREATED
+    DELETED
+    UPDATED
 }
 
 type DancerPayload {
-  dancerData: Dancer
-  editBy: String!
-  mutation: dancerMutation!
+    dancerData: Dancer
+    editBy: String!
+    mutation: dancerMutation!
 }
 
 type DancerResponse {
-  id: ID!
-  msg: String
-  name: String!
-  ok: Boolean!
-  parts: [Part!]!
-  positionData: [Position!]!
+    id: ID!
+    msg: String
+    name: String!
+    ok: Boolean!
+    parts: [Part!]!
+    positionData: [Position!]!
 }
 
 input DeleteControlFrameInput {
-  frameID: String!
+    frameID: String!
 }
 
 input deleteDancerInput {
-  id: ID!
+    id: ID!
 }
 
 type DeleteLEDEffectResponse {
-  msg: String
-  ok: Boolean!
+    msg: String
+    ok: Boolean!
 }
 
 input DeleteLEDInput {
-  effectName: String!
-  partName: String!
+    effectName: String!
+    partName: String!
 }
 
 input DeletePartInput {
-  dancerName: String!
-  id: ID!
+    dancerName: String!
+    id: ID!
 }
 
 input DeletePositionFrameInput {
-  frameID: String!
-}
-
-input editColorInput {
-  colorCode: String!
-  new_color: String!
-  original_color: String!
+    frameID: String!
 }
 
 input EditControlFrameInput {
-  fade: Boolean
-  frameID: String!
-  start: Float
+    fade: Boolean
+    frameID: String!
+    start: Float
 }
 
 input EditControlInput {
-  controlData: [ControlDataInput!]!
-  dancerName: String!
+    controlData: [ControlDataInput!]!
+    dancerName: String!
 }
 
 input editDancerInput {
-  id: ID!
-  name: String!
+    id: ID!
+    name: String!
 }
 
 input EditPartInput {
-  dancerName: String!
-  id: ID!
-  name: String!
-  type: String!
+    dancerName: String!
+    id: ID!
+    name: String!
+    type: String!
 }
 
 input EditPositionFrameInput {
-  frameID: String!
-  start: Float!
+    frameID: String!
+    start: Float!
 }
 
 input EditPositionInput {
-  dancerName: String!
-  positionData: PositionDataInput!
+    dancerName: String!
+    positionData: PositionDataInput!
 }
 
 type Effect {
-  alpha: Float!
-  colorCode: String!
+    alpha: Float!
+    colorCode: String!
 }
 
 input EffectInput {
-  alpha: Float!
-  colorCode: String!
+    alpha: Float!
+    colorCode: String!
 }
 
 type EffectList {
-  data: EffectListObjectId!
-  description: String
-  end: Float!
-  id: ID!
-  start: Float!
+    data: EffectListObjectId!
+    description: String
+    end: Float!
+    id: ID!
+    start: Float!
 }
 
-"""Mongo object id scalar type"""
+"""
+Mongo object id scalar type
+"""
 scalar EffectListObjectId
 
 type EffectListPayload {
-  editBy: String!
-  effectListData: EffectList
-  effectListID: ID!
-  mutation: String!
+    editBy: String!
+    effectListData: EffectList
+    effectListID: ID!
+    mutation: String!
 }
 
 type EffectListResponse {
-  msg: String
-  ok: Boolean!
+    msg: String
+    ok: Boolean!
 }
 
 type EL {
-  value: Int!
+    value: Int!
 }
 
 type FIBER {
-  alpha: Float!
-  color: String!
+    alpha: Float!
+    color: String!
 }
 
 type LED {
-  alpha: Float!
-  src: String!
+    alpha: Float!
+    src: String!
 }
 
 input LEDEffectInput {
-  effect: [EffectInput!]!
-  fade: Boolean!
-  start: Float!
+    effect: [EffectInput!]!
+    fade: Boolean!
+    start: Float!
 }
 
 type LEDEffectResponse {
-  effectName: String!
-  effects: [LEDEffects!]!
-  msg: String
-  ok: Boolean!
-  partName: String!
-  repeat: Int!
+    effectName: String!
+    effects: [LEDEffects!]!
+    msg: String
+    ok: Boolean!
+    partName: String!
+    repeat: Int!
 }
 
 type LEDEffects {
-  effect: [Effect!]!
-  fade: Boolean!
-  start: Float!
+    effect: [Effect!]!
+    fade: Boolean!
+    start: Float!
 }
 
 type LEDMap {
-  LEDMap: LEDMapCustomScalar!
+    LEDMap: LEDMapCustomScalar!
 }
 
-"""LED map scalar type"""
+"""
+LED map scalar type
+"""
 scalar LEDMapCustomScalar
 
 type Map {
-  frames: MapQueryObjectId!
+    frames: MapQueryObjectId!
 }
 
-"""Mongo object id scalar type"""
+"""
+Mongo object id scalar type
+"""
 scalar MapQueryObjectId
 
 type Mutation {
-  addColor(color: addColorInput!): Color!
-  addControlFrame(fade: Boolean = false, start: Float!): ControlFrame!
-  addDancer(dancer: AddDancerInput!): DancerResponse!
-  addEffectList(description: String, end: Float!, start: Float!): EffectList!
-  addLED(input: AddLEDInput!): LEDEffectResponse!
-  addPart(part: AddPartInput!): PartResponse!
-  addPositionFrame(start: Float!): PositionFrame!
-  applyEffectList(clear: Boolean!, id: ID!, start: Float!): EffectListResponse!
-  CancelEditControl(FrameID: String!): RequestEditResponse!
-  CancelEditPosition(FrameID: String!): RequestEditResponse!
-  deleteColor(color: String!): Color!
-  deleteControlFrame(input: DeleteControlFrameInput!): ControlFrame!
-  deleteDancer(dancer: deleteDancerInput!): DancerResponse!
-  deleteEffectList(id: ID!): EffectListResponse!
-  deleteLED(input: DeleteLEDInput!): DeleteLEDEffectResponse!
-  deletePart(part: DeletePartInput!): PartResponse!
-  deletePositionFrame(input: DeletePositionFrameInput!): PositionFrame!
-  editColor(color: editColorInput!): Color!
-  editControlFrame(input: EditControlFrameInput!): ControlFrame!
-  editControlMap(controlData: [EditControlInput!]!, fade: Boolean = false, start: Float!): ControlData!
-  editDancer(dancer: editDancerInput!): DancerResponse!
-  editPart(part: EditPartInput!): PartResponse!
-  editPositionFrame(input: EditPositionFrameInput!): PositionFrame!
-  editPosMap(positionData: [EditPositionInput!]!, start: Float!): Map!
-  RequestEditControl(FrameID: String!): RequestEditResponse!
-  RequestEditPosition(FrameID: String!): RequestEditResponse!
-  shift(end: Float!, move: Float!, shiftControl: Boolean!, shiftPosition: Boolean!, start: Float!): ShiftResponse!
-  updateColor(color: ColorInput!): String!
+    addControlFrame(fade: Boolean = false, start: Float!): ControlFrame!
+    addDancer(dancer: AddDancerInput!): DancerResponse!
+    addPart(part: AddPartInput!): PartResponse!
+    addPositionFrame(start: Float!): PositionFrame!
+    CancelEditControl(FrameID: String!): RequestEditResponse!
+    CancelEditPosition(FrameID: String!): RequestEditResponse!
+    deleteControlFrame(input: DeleteControlFrameInput!): ControlFrame!
+    deleteDancer(dancer: deleteDancerInput!): DancerResponse!
+    deletePart(part: DeletePartInput!): PartResponse!
+    deletePositionFrame(input: DeletePositionFrameInput!): PositionFrame!
+    editControlFrame(input: EditControlFrameInput!): ControlFrame!
+    editControlMap(controlData: [EditControlInput!]!, fade: Boolean = false, start: Float!): ControlData!
+    editDancer(dancer: editDancerInput!): DancerResponse!
+    editPart(part: EditPartInput!): PartResponse!
+    editPositionFrame(input: EditPositionFrameInput!): PositionFrame!
+    editPosMap(positionData: [EditPositionInput!]!, start: Float!): Map!
+    RequestEditControl(FrameID: String!): RequestEditResponse!
+    RequestEditPosition(FrameID: String!): RequestEditResponse!
+    shift(end: Float!, move: Float!, shiftControl: Boolean!, shiftPosition: Boolean!, start: Float!): ShiftResponse!
+    updateColor(color: ColorInput!): String!
 }
 
 type Part {
-  controlData: [Control!]!
-  id: ID!
-  name: String!
-  type: ControlType
+    controlData: [Control!]!
+    id: ID!
+    name: String!
+    type: ControlType
 }
 
 type PartResponse {
-  controlData: [Control!]!
-  id: ID!
-  msg: String
-  name: String!
-  ok: Boolean!
-  type: ControlType
+    controlData: [Control!]!
+    id: ID!
+    msg: String
+    name: String!
+    ok: Boolean!
+    type: ControlType
 }
 
 type Position {
-  frame: PositionFrame!
-  x: Float!
-  y: Float!
-  z: Float!
+    frame: PositionFrame!
+    x: Float!
+    y: Float!
+    z: Float!
 }
 
 input PositionDataInput {
-  x: Float!
-  y: Float!
-  z: Float!
+    x: Float!
+    y: Float!
+    z: Float!
 }
 
 type PositionFrame {
-  editing: String
-  id: ID!
-  start: Float!
+    editing: String
+    id: ID!
+    start: Float!
 }
 
 type PositionMapPayload {
-  editBy: String!
-  frame: PosMapMutationObjectId!
+    editBy: String!
+    frame: PosMapMutationObjectId
+    frameID: String!
+    mutation: String!
 }
 
 type PositionRecordPayload {
-  addID: [String!]!
-  deleteID: [String!]!
-  editBy: String!
-  index: Int!
-  mutation: String!
-  updateID: [String!]!
+    editBy: String!
+    frameID: ID!
+    index: Int!
+    mutation: String!
+    updateID: [String!]!
 }
 
-"""Mongo object id scalar type"""
+"""
+Mongo object id scalar type
+"""
 scalar PosMapMutationObjectId
 
 type Query {
-  color(color: String!): String!
-  colorMap: ColorMap!
-  controlFrame(frameID: String!): ControlFrame!
-  controlFrameIDs: [ID!]!
-  ControlMap: Map!
-  dancer: [Dancer!]!
-  effectList: [EffectList!]!
-  getColors: [Color!]!
-  LEDMap: LEDMap!
-  positionFrame(start: Float!): PositionFrame!
-  positionFrameIDs: [ID!]!
-  PosMap: Map!
+    color(color: String!): String!
+    colorMap: ColorMap!
+    controlFrame(frameID: String!): ControlFrame!
+    controlFrameIDs: [ID!]!
+    ControlMap: Map!
+    dancer: [Dancer!]!
+    positionFrame(start: Float!): PositionFrame!
+    positionFrameIDs: [ID!]!
+    PosMap: Map!
 }
 
 type RequestEditResponse {
-  editing: String
-  ok: Boolean!
+    editing: String
+    ok: Boolean!
 }
 
 type ShiftResponse {
-  msg: String
-  ok: Boolean!
+    msg: String
+    ok: Boolean!
 }
 
 type Subscription {
-  colorSubscription: ColorPayload!
-  controlMapSubscription: ControlMapPayload!
-  controlRecordSubscription: ControlRecordPayload!
-  DancerSubscription: DancerPayload!
-  effectListSubscription: EffectListPayload!
-  positionMapSubscription: PositionMapPayload!
-  positionRecordSubscription: PositionRecordPayload!
+    colorSubscription: ColorPayload!
+    controlMapSubscription: ControlMapPayload!
+    controlRecordSubscription: ControlRecordPayload!
+    DancerSubscription: DancerPayload!
+    positionMapSubscription: PositionMapPayload!
+    positionRecordSubscription: PositionRecordPayload!
 }

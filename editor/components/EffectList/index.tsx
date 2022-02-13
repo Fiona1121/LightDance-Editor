@@ -2,11 +2,17 @@ import React, { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { selectLoad } from "slices/loadSlice";
-import { setTime, addEffect, applyEffect, deleteEffect, setEffectRecordMap, setEffectStatusMap } from "core/actions";
+import {
+    addEffect,
+    applyEffect,
+    deleteEffect,
+    setCurrentTime,
+    setEffectRecordMap,
+    setEffectStatusMap,
+} from "core/actions";
 import { getItem } from "core/utils";
 import { reactiveState } from "core/state";
 import { useReactiveVar } from "@apollo/client";
-import { TIMECONTROLLER } from "constants";
 
 import useControl from "hooks/useControl";
 
@@ -46,7 +52,8 @@ export default function EffectList() {
     const { controlMap, controlRecord } = useControl();
     const effectRecordMap = useReactiveVar(reactiveState.effectRecordMap);
     const effectStatusMap = useReactiveVar(reactiveState.effectStatusMap);
-    const { time, controlFrame } = useReactiveVar(reactiveState.timeData);
+    const currentTime = useReactiveVar(reactiveState.currentTime);
+    const currentControlIndex = useReactiveVar(reactiveState.currentControlIndex);
     const { waveSurferApp } = useContext(WaveSurferAppContext) as wavesurferContext;
 
     // initilize effectRecordMap and effectStatusMap
@@ -77,8 +84,10 @@ export default function EffectList() {
         const lastFrameNum: number = effectRecordMap[effectSelected].length - 1;
         const lastFrameId: string = effectRecordMap[effectSelected][lastFrameNum];
         const lastEffectTime: number =
-            effectStatusMap[lastFrameId].start - effectStatusMap[effectRecordMap[effectSelected][0]].start + time;
-        var frameNum: number = controlFrame + 1;
+            effectStatusMap[lastFrameId].start -
+            effectStatusMap[effectRecordMap[effectSelected][0]].start +
+            currentTime;
+        var frameNum: number = currentControlIndex + 1;
         var newCollided: number[] = [];
         while (controlMap[controlRecord[frameNum]].start <= lastEffectTime) {
             newCollided.push(frameNum);
@@ -129,8 +138,8 @@ export default function EffectList() {
 
     const handleAddEffect = async () => {
         // setTime({ payload: { from: TIMECONTROLLER, time: controlMap[controlRecord[parseInt(newEffectFrom)]].start } });
-        await reduxPromiseAction(setTime, {
-            payload: { from: TIMECONTROLLER, time: controlMap[controlRecord[parseInt(newEffectFrom)]].start },
+        await reduxPromiseAction(setCurrentTime, {
+            payload: controlMap[controlRecord[parseInt(newEffectFrom)]].start,
         });
         waveSurferApp.playPause();
         setPreviewing(true);
