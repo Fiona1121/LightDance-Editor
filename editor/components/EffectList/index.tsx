@@ -35,6 +35,7 @@ import {
     List,
     ListItem,
     ListItemText,
+    Snackbar,
     Stack,
     TextField,
     Tooltip,
@@ -80,16 +81,20 @@ export default function EffectList() {
     const [addOpened, setAddOpened] = useState<boolean>(false); // open add effect dialog
     const [previewing, setPreviewing] = useState<boolean>(false);
 
-    const handleCollide = () => {
+    const handleCollide = (effectSelected: string) => {
         const lastFrameNum: number = effectRecordMap[effectSelected].length - 1;
         const lastFrameId: string = effectRecordMap[effectSelected][lastFrameNum];
         const lastEffectTime: number =
             effectStatusMap[lastFrameId].start -
             effectStatusMap[effectRecordMap[effectSelected][0]].start +
             currentTime;
-        var frameNum: number = currentControlIndex + 1;
+        var frameNum: number = currentControlIndex;
         var newCollided: number[] = [];
         while (controlMap[controlRecord[frameNum]].start <= lastEffectTime) {
+            if (controlMap[controlRecord[frameNum]].start < currentTime) {
+                frameNum++;
+                continue;
+            }
             newCollided.push(frameNum);
             frameNum++;
         }
@@ -98,17 +103,18 @@ export default function EffectList() {
 
     const handleOpenApply = (key: string) => {
         setEffectSelected(key);
+        handleCollide(key);
         setApplyOpened(true);
-        handleCollide();
     };
 
     const handleCloseApply = () => {
         setApplyOpened(false);
+        setEffectSelected("");
         setCollidedFrame([]);
     };
     const handleApplyEffect = () => {
         applyEffect({ payload: effectSelected });
-        setApplyOpened(false);
+        handleCloseApply();
     };
 
     const handleOpenDelete = (key: string) => {
@@ -118,11 +124,12 @@ export default function EffectList() {
 
     const handleCloseDelete = () => {
         setDeleteOpened(false);
+        setEffectSelected("");
     };
 
     const handleDeleteEffect = () => {
         deleteEffect({ payload: effectSelected });
-        setDeleteOpened(false);
+        handleCloseDelete();
     };
 
     const handleOpenAdd = () => {
@@ -141,10 +148,12 @@ export default function EffectList() {
         await reduxPromiseAction(setCurrentTime, {
             payload: controlMap[controlRecord[parseInt(newEffectFrom)]].start,
         });
-        waveSurferApp.playPause();
-        setPreviewing(true);
         handleCloseAdd();
-        handleRecordCanvas();
+
+        // handleRecordCanvas();
+        // waveSurferApp.playPause();
+        // setPreviewing(true);
+
         addEffect({
             payload: {
                 effectName: newEffectName,
@@ -154,7 +163,7 @@ export default function EffectList() {
         });
     };
 
-    const reduxPromiseAction = (setValue, payload) => {
+    const reduxPromiseAction = (setValue: any, payload: any) => {
         return new Promise((resolve, reject) => {
             setValue(payload);
             resolve(payload);
@@ -172,7 +181,7 @@ export default function EffectList() {
         if (previewing) {
             const stopTime = controlMap[controlRecord[parseInt(newEffectTo)]].start;
             const record = setInterval(() => {
-                if (Math.round(waveSurferApp.waveSurfer.getCurrentTime() * 1000) >= stopTime) {
+                if (waveSurferApp.getCurrentTime() >= stopTime) {
                     waveSurferApp.playPause();
                     CanvasCapture.stopRecord();
                     setPreviewing(false);
@@ -187,69 +196,78 @@ export default function EffectList() {
     return (
         <div>
             <List>
-                {Object.entries(effectRecordMap).map(([key, value]) => (
-                    <>
-                        <React.Fragment key={key}>
-                            <ListItem
-                                secondaryAction={
-                                    <Stack direction="row" spacing={0.5}>
-                                        <Tooltip title="Apply Effect" arrow placement="top">
-                                            <IconButton
-                                                edge="end"
-                                                aria-label="apply"
-                                                size="large"
-                                                onClick={() => handleOpenApply(key)}
-                                            >
-                                                <AddIcon fontSize="inherit" sx={{ color: "white" }} />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="Delete Effect" arrow placement="top">
-                                            <IconButton
-                                                edge="end"
-                                                aria-label="delete"
-                                                size="large"
-                                                onClick={() => handleOpenDelete(key)}
-                                            >
-                                                <DeleteIcon fontSize="inherit" sx={{ color: "white" }} />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </Stack>
-                                }
-                                sx={{ paddingLeft: 0, paddingTop: 0, paddingBottom: 0 }}
-                            >
-                                <Box
-                                    sx={{
-                                        height: 76,
-                                        width: 106,
-                                        marginRight: "2%",
-                                    }}
-                                >
-                                    <img
-                                        width="106px"
-                                        height="76px"
-                                        className="static"
-                                        src="components/EffectList/cat.png"
-                                    />
-                                    <img
-                                        width="106px"
-                                        height="76px"
-                                        className="active"
-                                        src="components/EffectList/cat.gif"
-                                    />
-                                </Box>
-                                <ListItemText
-                                    primary={<Typography sx={{ fontSize: "20px", color: "white" }}>{key}</Typography>}
-                                    secondary={
-                                        <Typography sx={{ fontSize: "10px", color: "white" }}>
-                                            Length: {value ? value.length : 0}
-                                        </Typography>
-                                    }
+                {Object.entries(effectRecordMap).map(
+                    ([key, value]) =>
+                        value.every((id: string) => Object.keys(effectStatusMap).includes(id)) && (
+                            <>
+                                <React.Fragment key={key}>
+                                    <ListItem
+                                        secondaryAction={
+                                            <Stack direction="row" spacing={0.5}>
+                                                <Tooltip title="Apply Effect" arrow placement="top">
+                                                    <IconButton
+                                                        edge="end"
+                                                        aria-label="apply"
+                                                        size="large"
+                                                        onClick={() => handleOpenApply(key)}
+                                                    >
+                                                        <AddIcon fontSize="inherit" sx={{ color: "white" }} />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Delete Effect" arrow placement="top">
+                                                    <IconButton
+                                                        edge="end"
+                                                        aria-label="delete"
+                                                        size="large"
+                                                        onClick={() => handleOpenDelete(key)}
+                                                    >
+                                                        <DeleteIcon fontSize="inherit" sx={{ color: "white" }} />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </Stack>
+                                        }
+                                        sx={{ paddingLeft: 0, paddingTop: 0, paddingBottom: 0 }}
+                                    >
+                                        <Box
+                                            sx={{
+                                                height: 76,
+                                                width: 106,
+                                                marginRight: "2%",
+                                            }}
+                                        >
+                                            <img
+                                                width="106px"
+                                                height="76px"
+                                                className="static"
+                                                src="components/EffectList/cat.png"
+                                            />
+                                            <img
+                                                width="106px"
+                                                height="76px"
+                                                className="active"
+                                                src="components/EffectList/cat.gif"
+                                            />
+                                        </Box>
+                                        <ListItemText
+                                            primary={
+                                                <Typography sx={{ fontSize: "20px", color: "white" }}>{key}</Typography>
+                                            }
+                                            secondary={
+                                                <Typography sx={{ fontSize: "10px", color: "white" }}>
+                                                    Length: {value ? value.length : 0}
+                                                </Typography>
+                                            }
+                                        />
+                                    </ListItem>
+                                </React.Fragment>
+                                <Divider
+                                    variant="inset"
+                                    component="li"
+                                    sx={{ backgroundColor: "rgba(255, 255, 255, 0.16)" }}
                                 />
-                            </ListItem>
-                        </React.Fragment>
-                        <Divider variant="inset" component="li" sx={{ backgroundColor: "rgba(255, 255, 255, 0.16)" }} />
-                    </>
-                ))}
+                            </>
+                        )
+                )}
                 <Grid
                     container
                     justifyContent="center"
@@ -391,6 +409,12 @@ export default function EffectList() {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <Snackbar
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                open={previewing}
+                message="[ADD EFFECT] Previewing your new effect..."
+                key="preview snackbar"
+            />
         </div>
     );
 }

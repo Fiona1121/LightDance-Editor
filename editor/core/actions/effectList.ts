@@ -1,7 +1,8 @@
+import { controlAgent } from "api";
 import { registerActions } from "../registerActions";
 // types
 import { EffectRecordMapType, EffectRecordType, EffectStatusMapType, State } from "../models";
-import { getControl, setItem } from "core/utils";
+import { binarySearchFrameMap, getControl, setItem } from "core/utils";
 import { nanoid } from "nanoid";
 
 const actions = registerActions({
@@ -33,14 +34,16 @@ const actions = registerActions({
     addEffect: async (state: State, payload: { effectName: string; startIndex: number; endIndex: number }) => {
         const [controlMap, controlRecord] = await getControl();
         const { effectName, startIndex, endIndex } = payload;
+        const newRecord = controlRecord.slice(startIndex, endIndex);
 
-        state.effectRecordMap[effectName] = controlRecord.slice(startIndex, endIndex);
-        state.effectRecordMap[effectName].map((id) => {
+        state.effectRecordMap[effectName] = newRecord;
+        newRecord.map((id: string) => {
             state.effectStatusMap[id] = controlMap[id];
         });
         setItem("effectRecordMap", JSON.stringify(state.effectRecordMap));
         setItem("effectStatusMap", JSON.stringify(state.effectStatusMap));
     },
+
     /**
      * delete chosen effect from EffectRecodeMap and EffectStatusMap
      * @param {State} state
@@ -62,22 +65,21 @@ const actions = registerActions({
      * @param {State} state
      * @param {string} payload
      */
-    applyEffect: async (state, payload: string) => {
-        const [controlMap, controlRecord] = await getControl();
+    applyEffect: (state: State, payload: string) => {
         const effectName: string = payload;
-        const shiftTime: number =
-            state.timeData.time - state.effectStatusMap[state.effectRecordMap[effectName][0]].start;
-        const controlRecordCopy = [...controlRecord];
-        const controlMapCopy = { ...controlMap };
-        state.effectRecordMap[effectName].map((id) => {
-            const newId: string = nanoid(6);
-            controlRecordCopy.push(newId);
-            controlMapCopy[newId] = { ...state.effectStatusMap[id] };
-            controlMapCopy[newId].start += shiftTime;
+        const shiftTime: number = state.currentTime - state.effectStatusMap[state.effectRecordMap[effectName][0]].start;
+        state.effectRecordMap[effectName].map(async (id: string) => {
+            const [controlMap, controlRecord] = await getControl();
+            const newFrame = state.effectStatusMap[id];
+            newFrame.start += shiftTime;
+            const newFrameIndex = binarySearchFrameMap(controlRecord, controlMap, newFrame.start);
+            await controlAgent.addFrame(
+                newFrame.status,
+                newFrame.start,
+                newFrameIndex,
+                controlMap[controlRecord[newFrameIndex - 1]].fade
+            );
         });
-        // TODO: save new control record and map
-        // state.controlRecord = controlRecordCopy.sort((a, b) => controlMapCopy[a].start - controlMapCopy[b].start);
-        // state.controlMap = controlMapCopy;
     },
 });
 

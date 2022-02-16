@@ -84,7 +84,7 @@ type ControlRecordPayload {
     frameID: ID!
     index: Int!
     mutation: String!
-    updateID: [String!]!
+    updateID: [String!]
 }
 
 """
@@ -342,7 +342,7 @@ type PositionRecordPayload {
     frameID: ID!
     index: Int!
     mutation: String!
-    updateID: [String!]!
+    updateID: [String!]
 }
 
 """
