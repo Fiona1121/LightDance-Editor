@@ -19,6 +19,8 @@ import useControl from "hooks/useControl";
 import { WaveSurferAppContext } from "contexts/WavesurferContext";
 import { wavesurferContext } from "types/components/wavesurfer";
 
+import Preview from "./Preview";
+
 // mui materials
 import {
     Box,
@@ -44,7 +46,6 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import * as CanvasCapture from "canvas-capture";
-import "./style.css";
 
 export default function EffectList() {
     const { effectRecordMap: loadedEffectRecordMap } = useSelector(selectLoad); // load from default
@@ -79,6 +80,7 @@ export default function EffectList() {
     const [applyOpened, setApplyOpened] = useState<boolean>(false); // open apply effect dialog
     const [deleteOpened, setDeleteOpened] = useState<boolean>(false); // open delete effect dialog
     const [addOpened, setAddOpened] = useState<boolean>(false); // open add effect dialog
+    const [previewOpened, setPreviewOpened] = useState<boolean>(false);
     const [previewing, setPreviewing] = useState<boolean>(false);
 
     const handleCollide = (effectSelected: string) => {
@@ -145,22 +147,22 @@ export default function EffectList() {
 
     const handleAddEffect = async () => {
         // setTime({ payload: { from: TIMECONTROLLER, time: controlMap[controlRecord[parseInt(newEffectFrom)]].start } });
-        await reduxPromiseAction(setCurrentTime, {
-            payload: controlMap[controlRecord[parseInt(newEffectFrom)]].start,
-        });
+        // await reduxPromiseAction(setCurrentTime, {
+        //     payload: controlMap[controlRecord[parseInt(newEffectFrom)]].start,
+        // });
         handleCloseAdd();
-
+        setPreviewOpened(true);
         // handleRecordCanvas();
         // waveSurferApp.playPause();
         // setPreviewing(true);
 
-        addEffect({
-            payload: {
-                effectName: newEffectName,
-                startIndex: parseInt(newEffectFrom),
-                endIndex: parseInt(newEffectTo) + 1,
-            },
-        });
+        // addEffect({
+        //     payload: {
+        //         effectName: newEffectName,
+        //         startIndex: parseInt(newEffectFrom),
+        //         endIndex: parseInt(newEffectTo) + 1,
+        //     },
+        // });
     };
 
     const reduxPromiseAction = (setValue: any, payload: any) => {
@@ -168,13 +170,6 @@ export default function EffectList() {
             setValue(payload);
             resolve(payload);
         });
-    };
-
-    const handleRecordCanvas = () => {
-        CanvasCapture.init(document.getElementById("main_stage")?.childNodes[0], {
-            ffmpegCorePath: "./node_modules/@ffmpeg/core/dist/ffmpeg-core.js",
-        });
-        CanvasCapture.beginGIFRecord({ name: "myGif" });
     };
 
     useEffect(() => {
@@ -226,28 +221,7 @@ export default function EffectList() {
                                                 </Tooltip>
                                             </Stack>
                                         }
-                                        sx={{ paddingLeft: 0, paddingTop: 0, paddingBottom: 0 }}
                                     >
-                                        <Box
-                                            sx={{
-                                                height: 76,
-                                                width: 106,
-                                                marginRight: "2%",
-                                            }}
-                                        >
-                                            <img
-                                                width="106px"
-                                                height="76px"
-                                                className="static"
-                                                src="components/EffectList/cat.png"
-                                            />
-                                            <img
-                                                width="106px"
-                                                height="76px"
-                                                className="active"
-                                                src="components/EffectList/cat.gif"
-                                            />
-                                        </Box>
                                         <ListItemText
                                             primary={
                                                 <Typography sx={{ fontSize: "20px", color: "white" }}>{key}</Typography>
@@ -260,11 +234,7 @@ export default function EffectList() {
                                         />
                                     </ListItem>
                                 </React.Fragment>
-                                <Divider
-                                    variant="inset"
-                                    component="li"
-                                    sx={{ backgroundColor: "rgba(255, 255, 255, 0.16)" }}
-                                />
+                                <Divider component="li" sx={{ backgroundColor: "rgba(255, 255, 255, 0.16)" }} />
                             </>
                         )
                 )}
@@ -366,7 +336,6 @@ export default function EffectList() {
                         onChange={(e) => setNewEffectFrom(e.target.value)}
                     />
                     <TextField
-                        autoFocus
                         type="number"
                         margin="normal"
                         id="name"
@@ -393,7 +362,6 @@ export default function EffectList() {
                 <DialogActions>
                     <Button onClick={handleCloseAdd}>Cancel</Button>
                     <Button
-                        autoFocus
                         onClick={handleAddEffect}
                         disabled={
                             Object.keys(effectRecordMap).includes(newEffectName) ||
@@ -405,6 +373,18 @@ export default function EffectList() {
                             parseInt(newEffectTo) < parseInt(newEffectFrom)
                         }
                     >
+                        Add
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={previewOpened} fullWidth maxWidth="md">
+                <DialogTitle>Preview Effect</DialogTitle>
+                <DialogContent>
+                    <Preview />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setPreviewOpened(false)}>Cancel</Button>
+                    <Button autoFocus onClick={() => setPreviewOpened(false)}>
                         Add
                     </Button>
                 </DialogActions>
