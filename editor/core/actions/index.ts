@@ -11,3 +11,8 @@ export * from "./dancers";
 export * from "./colorMap";
 export * from "./led";
 export * from "./effectList";
+export * from "./edit";
+export * from "./selectionMode";
+export * from "./dancers";
+export * from "./colorMap";
+export * from "./preview";

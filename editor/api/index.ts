@@ -20,6 +20,7 @@ import {
     REQUEST_EDIT_POS_BY_ID,
     CANCEL_EDIT_CONTROL_BY_ID,
     CANCEL_EDIT_POS_BY_ID,
+    GET_DANCERS,
 } from "../graphql";
 
 //axios for api
@@ -27,6 +28,13 @@ import axios from "./axios";
 
 // types
 import { ControlMapStatus, DancerCoordinates, EffectStatusMapElementType } from "../core/models";
+
+export const dancerAgent = {
+    getDancers: async () => {
+        const dancerData = await client.query({ query: GET_DANCERS });
+        return dancerData.data.dancer;
+    },
+};
 
 /**
  * controlAgent: reponsible for controlMap and controlRecord

@@ -19,7 +19,7 @@ import useControl from "hooks/useControl";
 import { WaveSurferAppContext } from "contexts/WavesurferContext";
 import { wavesurferContext } from "types/components/wavesurfer";
 
-import Preview from "./Preview";
+// import Preview from "./Preview";
 
 // mui materials
 import {
@@ -50,7 +50,6 @@ import * as CanvasCapture from "canvas-capture";
 export default function EffectList() {
     const { effectRecordMap: loadedEffectRecordMap } = useSelector(selectLoad); // load from default
     const { effectStatusMap: loadedEffectStatusMap } = useSelector(selectLoad); // load from default
-    // const { effectRecordMap, effectStatusMap } = useSelector(selectGlobal);
     const { controlMap, controlRecord } = useControl();
     const effectRecordMap = useReactiveVar(reactiveState.effectRecordMap);
     const effectStatusMap = useReactiveVar(reactiveState.effectStatusMap);
@@ -379,9 +378,7 @@ export default function EffectList() {
             </Dialog>
             <Dialog open={previewOpened} fullWidth maxWidth="md">
                 <DialogTitle>Preview Effect</DialogTitle>
-                <DialogContent>
-                    <Preview />
-                </DialogContent>
+                <DialogContent></DialogContent>
                 <DialogActions>
                     <Button onClick={() => setPreviewOpened(false)}>Cancel</Button>
                     <Button autoFocus onClick={() => setPreviewOpened(false)}>
