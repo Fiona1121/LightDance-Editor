@@ -3,6 +3,9 @@ import { clamp, fadeStatus, interpolationPos, updateFrameByTimeMap } from "core/
 import { registerActions } from "../registerActions";
 
 const actions = registerActions({
+    setIsPreviewing: (state: State, payload: boolean) => {
+        state.isPreviewing = payload;
+    },
     /**
      * calculate the currentPreviewStatus, currentPreviewPos according to the time
      * @param {State} state
@@ -115,4 +118,5 @@ const actions = registerActions({
     },
 });
 
-export const { setCurrentPreviewTime, setCurrentPreviewControlIndex, setCurrentPreviewPosIndex } = actions;
+export const { setIsPreviewing, setCurrentPreviewTime, setCurrentPreviewControlIndex, setCurrentPreviewPosIndex } =
+    actions;

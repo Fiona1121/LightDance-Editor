@@ -273,16 +273,24 @@ Mongo object id scalar type
 scalar MapQueryObjectId
 
 type Mutation {
+    addColor(color: addColorInput!): Color!
     addControlFrame(fade: Boolean = false, start: Float!): ControlFrame!
     addDancer(dancer: AddDancerInput!): DancerResponse!
+    addEffectList(description: String, end: Float!, start: Float!): EffectList!
+    addLED(input: AddLEDInput!): LEDEffectResponse!
     addPart(part: AddPartInput!): PartResponse!
     addPositionFrame(start: Float!): PositionFrame!
+    applyEffectList(clear: Boolean!, id: ID!, start: Float!): EffectListResponse!
     CancelEditControl(FrameID: String!): RequestEditResponse!
     CancelEditPosition(FrameID: String!): RequestEditResponse!
+    deleteColor(color: String!): Color!
     deleteControlFrame(input: DeleteControlFrameInput!): ControlFrame!
     deleteDancer(dancer: deleteDancerInput!): DancerResponse!
+    deleteEffectList(id: ID!): EffectListResponse!
+    deleteLED(input: DeleteLEDInput!): DeleteLEDEffectResponse!
     deletePart(part: DeletePartInput!): PartResponse!
     deletePositionFrame(input: DeletePositionFrameInput!): PositionFrame!
+    editColor(color: editColorInput!): Color!
     editControlFrame(input: EditControlFrameInput!): ControlFrame!
     editControlMap(controlData: [EditControlInput!]!, fade: Boolean = false, start: Float!): ControlData!
     editDancer(dancer: editDancerInput!): DancerResponse!

@@ -16,14 +16,10 @@ import { useReactiveVar } from "@apollo/client";
 
 import useControl from "hooks/useControl";
 
-import { WaveSurferAppContext } from "contexts/WavesurferContext";
-import { wavesurferContext } from "types/components/wavesurfer";
-
 // import Preview from "./Preview";
 
 // mui materials
 import {
-    Box,
     Button,
     Dialog,
     DialogActions,
@@ -45,7 +41,6 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import * as CanvasCapture from "canvas-capture";
 
 export default function EffectList() {
     const { effectRecordMap: loadedEffectRecordMap } = useSelector(selectLoad); // load from default
@@ -55,7 +50,6 @@ export default function EffectList() {
     const effectStatusMap = useReactiveVar(reactiveState.effectStatusMap);
     const currentTime = useReactiveVar(reactiveState.currentTime);
     const currentControlIndex = useReactiveVar(reactiveState.currentControlIndex);
-    const { waveSurferApp } = useContext(WaveSurferAppContext) as wavesurferContext;
 
     // initilize effectRecordMap and effectStatusMap
     useEffect(() => {
@@ -145,47 +139,9 @@ export default function EffectList() {
     };
 
     const handleAddEffect = async () => {
-        // setTime({ payload: { from: TIMECONTROLLER, time: controlMap[controlRecord[parseInt(newEffectFrom)]].start } });
-        // await reduxPromiseAction(setCurrentTime, {
-        //     payload: controlMap[controlRecord[parseInt(newEffectFrom)]].start,
-        // });
         handleCloseAdd();
         setPreviewOpened(true);
-        // handleRecordCanvas();
-        // waveSurferApp.playPause();
-        // setPreviewing(true);
-
-        // addEffect({
-        //     payload: {
-        //         effectName: newEffectName,
-        //         startIndex: parseInt(newEffectFrom),
-        //         endIndex: parseInt(newEffectTo) + 1,
-        //     },
-        // });
     };
-
-    const reduxPromiseAction = (setValue: any, payload: any) => {
-        return new Promise((resolve, reject) => {
-            setValue(payload);
-            resolve(payload);
-        });
-    };
-
-    useEffect(() => {
-        if (previewing) {
-            const stopTime = controlMap[controlRecord[parseInt(newEffectTo)]].start;
-            const record = setInterval(() => {
-                if (waveSurferApp.getCurrentTime() >= stopTime) {
-                    waveSurferApp.playPause();
-                    CanvasCapture.stopRecord();
-                    setPreviewing(false);
-                    clearInterval(record);
-                } else {
-                    CanvasCapture.recordFrame();
-                }
-            }, 10);
-        }
-    }, [previewing]);
 
     return (
         <div>
