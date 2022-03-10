@@ -1,29 +1,31 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { loadState, textureType, loadType, DancersType } from "../types/loadSlice";
+import { LoadState, TextureType, LoadType, DancersType } from "../types/loadSlice";
 import {
     ControlMapType,
     ControlRecordType,
-    posRecordType,
-    lightPresetsType,
-    posPresetsType,
+    PosRecordType,
+    PosMapType,
+    LightPresetsType,
+    PosPresetsType,
     EffectRecordMapType,
     EffectStatusMapType,
 } from "../types/globalSlice";
 import { RootState, AppDispatch } from "../store/index";
 
-const initialState: loadState = {
+const initialState: LoadState = {
     init: false,
     music: "",
-    load: {} as loadType,
+    load: {} as LoadType,
     control: [],
     controlMap: {},
-    position: [],
+    posRecord: [],
+    posMap: {},
     lightPresets: [],
     posPresets: [],
     effectRecordMap: {},
     effectStatusMap: {},
-    texture: {} as textureType,
+    texture: {} as TextureType,
     dancers: {},
     dancerNames: [],
 };
@@ -34,7 +36,7 @@ export const loadSlice = createSlice({
         setInit: (state) => {
             state.init = true;
         },
-        setLoad: (state, action: PayloadAction<loadType>) => {
+        setLoad: (state, action: PayloadAction<LoadType>) => {
             state.load = action.payload;
         },
         setMusic: (state, action: PayloadAction<string>) => {
@@ -46,13 +48,16 @@ export const loadSlice = createSlice({
         setControlMap: (state, action: PayloadAction<ControlMapType>) => {
             state.controlMap = action.payload;
         },
-        setPosition: (state, action: PayloadAction<posRecordType>) => {
-            state.position = action.payload;
+        setPosMap: (state, action: PayloadAction<PosMapType>) => {
+            state.posMap = action.payload;
         },
-        setLightPresets: (state, action: PayloadAction<lightPresetsType>) => {
+        setPosition: (state, action: PayloadAction<PosRecordType>) => {
+            state.posRecord = action.payload;
+        },
+        setLightPresets: (state, action: PayloadAction<LightPresetsType>) => {
             state.lightPresets = action.payload;
         },
-        setPosPresets: (state, action: PayloadAction<posPresetsType>) => {
+        setPosPresets: (state, action: PayloadAction<PosPresetsType>) => {
             state.posPresets = action.payload;
         },
         setEffectRecordMap: (state, action: PayloadAction<EffectRecordMapType>) => {
@@ -61,7 +66,7 @@ export const loadSlice = createSlice({
         setEffectStatusMap: (state, action: PayloadAction<EffectStatusMapType>) => {
             state.effectStatusMap = action.payload;
         },
-        setTexture: (state, action: PayloadAction<textureType>) => {
+        setTexture: (state, action: PayloadAction<TextureType>) => {
             state.texture = action.payload;
         },
         setDancers: (state, action: PayloadAction<DancersType>) => {
@@ -80,10 +85,11 @@ const {
     setControl,
     setControlMap,
     setPosition,
-    setLightPresets,
-    setPosPresets,
+    setPosMap,
     setEffectRecordMap,
     setEffectStatusMap,
+    setLightPresets,
+    setPosPresets,
     setTexture,
     setDancers,
     setDancerNames,
@@ -101,11 +107,12 @@ export const fetchLoad = () => async (dispatch: AppDispatch) => {
         Music,
         Control,
         ControlMap,
-        Position,
+        PosRecord,
+        PosMap,
         LightPresets,
-        PosPresets,
         EffectRecordMap,
         EffectStatusMap,
+        PosPresets,
         Dancers,
         Texture,
     } = load;
@@ -120,8 +127,11 @@ export const fetchLoad = () => async (dispatch: AppDispatch) => {
     const controlMap = await fetchJson(ControlMap);
     dispatch(setControlMap(controlMap));
     // set Position
-    const position = await fetchJson(Position);
+    const position = await fetchJson(PosRecord);
     dispatch(setPosition(position));
+    // set PosMap
+    const posMap = await fetchJson(PosMap);
+    dispatch(setPosMap(posMap));
     // set lightPresets
     const lightPresets = await fetchJson(LightPresets);
     dispatch(setLightPresets(lightPresets));

@@ -24,7 +24,7 @@ import {
     GET_EFFECT_LIST,
     ADD_EFFECT_LIST,
     DELETE_EFFECT_LIST,
-    APPLY_EFFECT_LIST
+    APPLY_EFFECT_LIST,
 } from "../graphql";
 
 //axios for api
@@ -498,7 +498,7 @@ export const effectAgent = {
                     start: start,
                     applyEffectListId: applyId,
                 },
-                update: (cache, {data: {applyEffectList}}) => {
+                update: (cache, { data: { applyEffectList } }) => {
                     cache.modify({
                         id: "ROOT_QUERY",
                         fields: {
@@ -509,10 +509,12 @@ export const effectAgent = {
                                     ...controlFrameIDs.slice(start + 1),
                                 ];
                             },
-                        }
-                    })
-                }
-            })
+                        },
+                    });
+                },
+            });
+        } catch (error) {
+            console.error(error);
         }
     },
 };
