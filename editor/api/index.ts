@@ -21,6 +21,10 @@ import {
     CANCEL_EDIT_CONTROL_BY_ID,
     CANCEL_EDIT_POS_BY_ID,
     GET_DANCERS,
+    GET_EFFECT_LIST,
+    ADD_EFFECT_LIST,
+    DELETE_EFFECT_LIST,
+    APPLY_EFFECT_LIST
 } from "../graphql";
 
 //axios for api
@@ -431,6 +435,85 @@ export const posAgent = {
             },
         });
         return response.data.CancelEditPosition.ok;
+    },
+};
+
+export const effectAgent = {
+    getEffectList: async () => {
+        const effectListData = await client.query({ query: GET_EFFECT_LIST });
+        return effectListData.data.effectList;
+    },
+    addEffectList: async (name: string, start: number, end: number) => {
+        try {
+            await client.mutate({
+                mutation: ADD_EFFECT_LIST,
+                variables: {
+                    end: end,
+                    start: start,
+                    description: name,
+                },
+                update: (cache, { data: { addEffectList } }) => {
+                    cache.modify({
+                        id: "ROOT_QUERY",
+                        fields: {
+                            effectList(effectList) {
+                                return [...effectList, addEffectList];
+                            },
+                        },
+                    });
+                },
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    },
+    deleteEffectList: async (deleteId: string) => {
+        try {
+            await client.mutate({
+                mutation: DELETE_EFFECT_LIST,
+                variables: {
+                    deleteEffectListId: deleteId,
+                },
+                update: (cache, { data: { deleteEffectList } }) => {
+                    cache.modify({
+                        id: "ROOT_QUERY",
+                        fields: {
+                            effectList(effectList) {
+                                if (deleteEffectList.ok) return effectList.filter((e) => e.id !== deleteId);
+                            },
+                        },
+                    });
+                },
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    },
+    applyEffectList: async (clear: boolean, start: number, applyId: string) => {
+        try {
+            await client.mutate({
+                mutation: APPLY_EFFECT_LIST,
+                variables: {
+                    clear: clear,
+                    start: start,
+                    applyEffectListId: applyId,
+                },
+                update: (cache, {data: {applyEffectList}}) => {
+                    cache.modify({
+                        id: "ROOT_QUERY",
+                        fields: {
+                            controlFrameIDs(controlFrameIDs) {
+                                return [
+                                    ...controlFrameIDs.slice(0, start + 1),
+                                    Object.keys(editControlMap.frame)[0],
+                                    ...controlFrameIDs.slice(start + 1),
+                                ];
+                            },
+                        }
+                    })
+                }
+            })
+        }
     },
 };
 
